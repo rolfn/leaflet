@@ -52,7 +52,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1205}
+% \CheckSum{1220}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -525,26 +525,33 @@
     \ifx\filename@base\reserved@a\@tempswatrue\fi%
     \def\reserved@a{dvipdfm}%
     \ifx\filename@base\reserved@a\@tempswatrue\fi%
-    \if@tempswa%
+    \if@tempswa
       \ClassInfo{leaflet}{Generating code for dvips}%
       \def\LL@pagesize@specials#1#2{%
         \@tempdima=#1\@tempdimb=#2%
         \AtBeginDvi{\special{papersize=\the\@tempdima,\the\@tempdimb}}}%
-    \fi%
+    \fi
     \def\reserved@a{pdftex}%
     \ifx\filename@base\reserved@a
       \ClassInfo{leaflet}{Generating code for pdfTeX}%
       \def\LL@pagesize@specials#1#2{%
         \@tempdima=#1\@tempdimb=#2%
         \pdfpagewidth\@tempdima\pdfpageheight\@tempdimb}%
-    \fi%
+    \fi
+    \def\reserved@a{xetex}%
+    \ifx\filename@base\reserved@a
+      \ClassInfo{leaflet}{Generating code for XeTeX}%
+      \def\LL@pagesize@specials#1#2{%
+        \@tempdima=#1\@tempdimb=#2%
+        \pdfpagewidth\@tempdima\pdfpageheight\@tempdimb}%
+    \fi
     \def\reserved@a{vtex}%
     \ifx\filename@base\reserved@a
       \ClassInfo{leaflet}{Generating code for VTeX}%
       \def\LL@pagesize@specials#1#2{%
         \@tempdima=#1\@tempdimb=#2%
         \mediawidth\@tempdima\mediaheight\@tempdimb}%
-    \fi%
+    \fi
   \fi
 }
 %    \end{macrocode}
