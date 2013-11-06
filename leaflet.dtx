@@ -5,7 +5,7 @@
 %  (c) 2000 Walter Schmidt            <w.a.schmidt@gmx.net>
 %  (c) 2002/2004 Rolf Niepraschk      <Rolf.Niepraschk@ptb.de> and
 %                Hubert G\"a\ss{}lein <HubertJG@open.mind.de>
-%  (c) 2012 Rolf Niepraschk           <Rolf.Niepraschk@gmx.de>
+%  (c) 2012,... Rolf Niepraschk       <Rolf.Niepraschk@gmx.de>
 %
 % This file may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either version 1.3
@@ -22,14 +22,14 @@
 % \iffalse
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{leaflet}
-%<class>  [2012/06/04 v1.0d LaTeX document class (JS,WaS,RN,HjG)]
+%<class>  [2013/11/06 v1.0d LaTeX document class (JS,WaS,RN,HjG)]
 %
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v1.0d}   % change this when leaflet-manual changed, too.
-\def\filedate{2012/06/04}
-\def\docdate {2012/06/04} % change this when leaflet-manual changed, too.
+\def\fileversion{v1.0e}   % change this when leaflet-manual changed, too.
+\def\filedate{2013/11/06}
+\def\docdate {2013/11/06} % change this when leaflet-manual changed, too.
 %</driver|manual>
 %<*driver>
 \listfiles
@@ -515,6 +515,7 @@
 % Now the graphics driver is known.
 % We will Check the graphics driver and set special code for page 
 % dimensions and other.
+% \changes{v1.0e}{2013/11/06}{Patch from Toby Thurston for XeLaTeX. (RN)}
 %    \begin{macrocode}
 \newcommand*\LL@pagesize@specials[2]{}
 \@ifundefined{Gin@driver}{}%
