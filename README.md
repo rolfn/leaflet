@@ -14,6 +14,8 @@ Recommended TDS locations:
 For general installation advice, see
 http://www.tex.ac.uk/cgi-bin/texfaq2html?label=instpackages
 
+The leaflet document class is also on CTAN:[macros/latex/contrib/leaflet](http://mirrors.ctan.org/macros/latex/contrib/leaflet)
+
 
 
 
