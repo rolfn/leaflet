@@ -10,6 +10,7 @@ LATEX = latex
 
 VERSION = $(shell awk -F"[{}]" '/fileversion/ {print $$2}' leaflet.dtx)
 
+DIST_DIR = leaflet
 DIST_FILES = leaflet.dtx leaflet.ins leaflet.pdf leaflet-manual.pdf README
 ARCHNAME = $(CLASS)-$(VERSION).zip
 
@@ -37,7 +38,10 @@ README : README.md
      {print}' > $@
 
 dist : $(DIST_FILES)
-	zip $(ARCHNAME) $(DIST_FILES)
+	mkdir -p $(DIST_DIR)
+	cp -p $+ $(DIST_DIR)
+	zip $(ARCHNAME) -r $(DIST_DIR)
+	rm -rf $(DIST_DIR)
 
 clean :
 	$(RM) *.aux *.log *.glg *.glo *.gls *.idx *.ilg *.ind *.toc
