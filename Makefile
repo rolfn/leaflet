@@ -1,69 +1,49 @@
-
+# Rolf Niepraschk, 2013-11-07, Rolf.Niepraschk@gmx.de
 
 .SUFFIXES : .tex .ltx .dvi .ps .pdf .eps
 
 CLASS = leaflet
 
 PDFLATEX = pdflatex
-
+TEX = tex
 LATEX = latex
 
-#ARCHNAME = $(CLASS)-$(shell date +"%y%m%d-%H%M")
-ARCHNAME = $(CLASS)-$(shell date +"%y%m%d")
+VERSION = $(shell awk -F"[{}]" '/fileversion/ {print $$2}' leaflet.dtx)
 
-EXAMPLE = $(CLASS)-manual.tex
+DIST_FILES = leaflet.dtx leaflet.ins leaflet.pdf leaflet-manual.pdf README
+ARCHNAME = $(CLASS)-$(VERSION).zip
 
-ARCHFILES = $(CLASS).ins $(CLASS).dtx  \
-            # rotk.tex leaflet-test.tex
+all : leaflet.cls leaflet.pdf leaflet-manual.pdf
 
-all : docpdf pdf
+leaflet.cls : leaflet.dtx
+	$(TEX) $(basename $<).ins
 
-pdf : $(EXAMPLE:.tex=.pdf)
+leaflet-manual.pdf : leaflet-manual.tex leaflet.cls
+	$(PDFLATEX) $<
 
-ps  : $(EXAMPLE:.tex=.ps)
-
-doc : $(CLASS).ps 
-
-docpdf : $(CLASS).pdf
-
-%.dvi : %.tex $(CLASS).cls  
-	$(LATEX) $<
-        
-%.pdf : %.tex $(CLASS).cls  
-	$(PDFLATEX) $< 
-
-$(CLASS).cls $(EXAMPLE): $(CLASS).ins $(CLASS).dtx
-	tex $<
-	mv $(basename $<).log $<.log
-
-# $(EXAMPLE).pdf via ps2pdf:
-# latex leaflet-manual.tex 
-# dvips leaflet-manual 
-# ps2pdf -dAutoRotatePages=/None leaflet-manual.ps
-        
-%.ps : %.dvi
-	dvips -o $@ $<
-
-$(CLASS).dvi : $(CLASS).dtx $(CLASS).cls
+leaflet.pdf : leaflet.dtx
 	if ! test -f $(basename $<).glo ; then touch $(basename $<).glo; fi
 	if ! test -f $(basename $<).idx ; then touch $(basename $<).idx; fi
 	makeindex -s gglo.ist -t $(basename $<).glg -o $(basename $<).gls \
 		$(basename $<).glo
 	makeindex -s gind.ist -t $(basename $<).ilg -o $(basename $<).ind \
 		$(basename $<).idx
-	$(LATEX) $<
-        
-$(CLASS).pdf : $(CLASS).dtx $(CLASS).cls
-	if ! test -f $(basename $<).glo ; then touch $(basename $<).glo; fi
-	if ! test -f $(basename $<).idx ; then touch $(basename $<).idx; fi
-	makeindex -s gglo.ist -t $(basename $<).glg -o $(basename $<).gls \
-		$(basename $<).glo
-	makeindex -s gind.ist -t $(basename $<).ilg -o $(basename $<).ind \
-		$(basename $<).idx
-	$(PDFLATEX) $<        
+	$(PDFLATEX) $<
+	$(PDFLATEX) $<
 
-arch :
-	zip $(ARCHNAME).zip $(ARCHFILES) Makefile
-        
-dist :
-	zip $(ARCHNAME).zip $(ARCHFILES) leaflet-manual.pdf leaflet.pdf README  
+README : README.md
+	cat $< | awk '/^```/ {$$0=""} \
+     /is also/ {$$0=""} \
+     {print}' > $@
+
+dist : $(DIST_FILES)
+	zip $(ARCHNAME) $(DIST_FILES)
+
+clean :
+	$(RM) *.aux *.log *.glg *.glo *.gls *.idx *.ilg *.ind *.toc
+
+veryclean : clean
+	$(RM) leaflet.pdf leaflet-manual.pdf leaflet.cls README $(ARCHNAME)
+
+debug :
+	@echo $(ARCHNAME)
