@@ -33,7 +33,7 @@ leaflet.pdf : leaflet.dtx
 
 README : README.md
 	cat $< | awk '/^```/ {$$0=""} \
-     /is also/ {$$0=""} \
+     /is also/ {exit} \
      {print}' > $@
 
 dist : $(DIST_FILES)
