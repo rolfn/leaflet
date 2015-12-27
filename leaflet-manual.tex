@@ -21,9 +21,9 @@
 %% This work has the LPPL maintenance status "author-maintained".
 %% 
 \def\filename{leaflet-manual.tex}
-\def\fileversion{v1.0e}   % change this when leaflet-manual changed, too.
-\def\filedate{2013/11/06}
-\def\docdate {2013/11/06} % change this when leaflet-manual changed, too.
+\def\fileversion{v1.1a}   % change this when leaflet-manual changed, too.
+\def\filedate{2015/12/27}
+\def\docdate {2015/12/27} % change this when leaflet-manual changed, too.
 \listfiles
 \errorcontextlines=99
 \documentclass[
@@ -300,6 +300,10 @@ Default options are marked with an asterisk:
   Allows the typesetting of a four page leaflet (first part) and a two page
   detachable form (second part), for fill-in forms, questionnaires, applications,
   etc.
+\item[\Lopt{foldcorr}, \Lopt{nofoldcorr}{\defaultmarker}]
+  Decreases the width of pages 4 and 5 by 2\,\% (A4 paper: 2\,mm) and
+  increases the other pages by 1\,\% (A4 paper: 1\,mm) for easier
+  folding in combine mode.
 \end{description}
 
 Other options are passed to the \Lclass{article} class.
