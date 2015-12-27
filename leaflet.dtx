@@ -15,21 +15,21 @@
 %    http://www.latex-project.org/lppl.txt
 %
 % and version 1.3 or later is part of all distributions of LaTeX
-% version 2003/12/01 or later. 
+% version 2003/12/01 or later.
 %
 % \fi
 %
 % \iffalse
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{leaflet}
-%<class>  [2013/11/06 v1.0d LaTeX document class (JS,WaS,RN,HjG)]
+%<class>  [2015/12/27 v1.1a LaTeX document class (JS,WaS,RN,HjG)]
 %
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v1.0e}   % change this when leaflet-manual changed, too.
-\def\filedate{2013/11/06}
-\def\docdate {2013/11/06} % change this when leaflet-manual changed, too.
+\def\fileversion{v1.1a}   % change this when leaflet-manual changed, too.
+\def\filedate{2015/12/27}
+\def\docdate {2015/12/27} % change this when leaflet-manual changed, too.
 %</driver|manual>
 %<*driver>
 \listfiles
@@ -52,7 +52,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1220}
+% \CheckSum{1275}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -83,8 +83,8 @@
 % \changes{v1.0pre3}{2004/07/07}{Options `landscape' and `portait'. (RN)}
 % \changes{v1.0}{2004/08/06}{CTAN release. (RN/HjG)}
 % \changes{v1.0a}{2004/08/08}{Option `debug'. (RN)}
-% \changes{v1.0d}{2012/06/04}{Options `twopart/notwopart' suggested 
-%   by Luis Rivera. No more `final' in \cmd{\ExecuteOptions} suggested 
+% \changes{v1.0d}{2012/06/04}{Options `twopart/notwopart' suggested
+%   by Luis Rivera. No more `final' in \cmd{\ExecuteOptions} suggested
 %   by Axel Berger (RN)}
 %
 % \DoNotIndex{\newcommand,\renewcommand,\newenvironment,\renewenvironment}
@@ -158,6 +158,8 @@
 \@ifundefined{iflandscape}{\newif\iflandscape}{}%
 \@ifundefined{iftumble}{\newif\iftumble}{}%
 \@ifundefined{iftwopart}{\newif\iftwopart}{}%
+\@ifundefined{iffoldcorr}{\newif\iffoldcorr}{}%
+\newlength\LL@tempdima
 \newcommand\LL@debug@info[1]{}%
 \DeclareOption{dvips}{\PassOptionsToPackage{\CurrentOption}{graphics}}
 \DeclareOption{pdftex}{\PassOptionsToPackage{\CurrentOption}{graphics}}
@@ -212,18 +214,24 @@
   \def\LL@foldmark{%
     \begingroup
       \linethickness{\LenToUnit{\foldmarkrule}}%
-      \setlength\@tempdima{\paperheight-\LL@tmargin}%
+      \@tempdima=\dimexpr\paperheight-\LL@tmargin
       \put(0,\LenToUnit{\@tempdima}){%
         \line(0,-1){\LenToUnit{\foldmarklength}}}%
     \endgroup}%
 }
 %    \end{macrocode}
-% \changes{v1.0d}{2004/12/22}{Invalid code for option ``nofoldmark'' 
+% \changes{v1.0d}{2004/12/22}{Invalid code for option ``nofoldmark''
 % changed. Thanks to Una Smith |<una.smith@att.net>|. (RN)}
-%    \begin{macrocode} 
+%    \begin{macrocode}
 \DeclareOption{nofoldmark}{\def\LL@foldmark{}}%
 %    \end{macrocode}
 %  \end{macro}
+% \changes{v1.1a}{2015/12/27}{New options `foldcorr/nofoldcorr' suggested by
+%   Walter Schmidt. (RN)}
+%    \begin{macrocode}
+\DeclareOption{foldcorr}{\foldcorrtrue}
+\DeclareOption{nofoldcorr}{\foldcorrfalse}
+%    \end{macrocode}
 %    \begin{macrocode}
 \newcommand*\LL@toomanypages[2]{}
 \DeclareOption{draft}{\PassOptionsToClass{\CurrentOption}{article}%
@@ -277,16 +285,16 @@
 %  \begin{macro}{\openout}
 %  \begin{macro}{\closeout}
 % Im Folgenden definieren wir die \TeX{} primitives \cmd{\immediate},
-% \cmd{\write}, \cmd{\openout} und \cmd{\closeout} um. Alle nicht 
-% ``immediate'' ausgef\"uhrten Anweisungen werden dem Makro 
+% \cmd{\write}, \cmd{\openout} und \cmd{\closeout} um. Alle nicht
+% ``immediate'' ausgef\"uhrten Anweisungen werden dem Makro
 % \cmd{\@@@pending@outs} (Kommaliste) hinzugef\"ugt. So k\"onnen speziell die
-% \cmd{\write}-Anweisungen unabh\"angig von \TeX's \cmd{\shipout} 
-% zu einem g\"unstigen Zeitpunkt ausgef\"uhrt werden. For V\TeX\ we 
+% \cmd{\write}-Anweisungen unabh\"angig von \TeX's \cmd{\shipout}
+% zu einem g\"unstigen Zeitpunkt ausgef\"uhrt werden. For V\TeX\ we
 % must keep in mind that \cmd{\immediate}\cmd{\special} exist.
-% \changes{v1.0b}{2004/08/12}{\cmd{\special} must be processed similar 
+% \changes{v1.0b}{2004/08/12}{\cmd{\special} must be processed similar
 % to e.\,g. \cmd{\write} (V\TeX). (RN)}
 %    \begin{macrocode}
-  \def\@@@pending@outs{}\let\@@@immediate\immediate 
+  \def\@@@pending@outs{}\let\@@@immediate\immediate
   \let\@@@write\write \let\@@@special\special
   \let\@@@openout\openout \let\@@@closeout\closeout
   \def\immediate{%
@@ -313,8 +321,8 @@
   \let\closeout\pending@closeout
 %    \end{macrocode}
 %  \begin{macro}{\@dummy@whatsit}
-% Makes our redefined primitives more like ``whatsits'' (???). 
-% `\cmd{\special}|{}|' is also possible for pdf\TeX\ but we get a lot of 
+% Makes our redefined primitives more like ``whatsits'' (???).
+% `\cmd{\special}|{}|' is also possible for pdf\TeX\ but we get a lot of
 % strange warnings (``|Non-PDF special ignored!|'') in this case.
 %    \begin{macrocode}
   \def\@dummy@whatsit{\special{}}
@@ -358,10 +366,10 @@
 %    \end{macrocode}
 %  \end{macro}
 %  \begin{macro}{\@@@exec@outs}
-% Note to this implementation: The out commands and the page breaks are not 
+% Note to this implementation: The out commands and the page breaks are not
 % allways in sync, which means possible wrong page references.
 %    \begin{macrocode}
-    \newcommand*\@@@exec@outs{% 
+    \newcommand*\@@@exec@outs{%
       \@@@pending@outs\gdef\@@@pending@outs{}%
       \LL@debug@info{%
         >>> execute the output commands of the current page <<<}}%
@@ -394,7 +402,7 @@
 %    \begin{macrocode}
 \def\pending@openout#1 {%
   \global\advance\c@@@total@outs\@ne%
-  \marks\@@@out@mark{\the\c@@@total@outs}% 
+  \marks\@@@out@mark{\the\c@@@total@outs}%
   \g@addto@macro\@@@pending@outs{\@@@immediate\@@@openout\number#1,}}%
 %    \end{macrocode}
 %  \end{macro}
@@ -405,20 +413,20 @@
 %    \begin{macrocode}
 \def\pending@closeout#1{%
   \global\advance\c@@@total@outs\@ne%
-  \marks\@@@out@mark{\the\c@@@total@outs}% 
+  \marks\@@@out@mark{\the\c@@@total@outs}%
   \g@addto@macro\@@@pending@outs{\@@@immediate\@@@closeout\number#1,}}%
 %    \end{macrocode}
 %  \end{macro}
 %  \begin{macro}{\@@@exec@outs}
 % With the call of \cmd{\@@@exec@outs} we simulate \TeX's
-% execution of non-immediate output commands. The number of pending 
-% commands which can be executed must be decremented by 
-% $\cmd{\value}|{@@total@outs}| - \cmd{\botmarks}\cmd{\@@@out@mark}$. The 
-% remaining commands must still wait until the next output page is 
-% ready. It works only for output commands in the main text which moved to 
+% execution of non-immediate output commands. The number of pending
+% commands which can be executed must be decremented by
+% $\cmd{\value}|{@@total@outs}| - \cmd{\botmarks}\cmd{\@@@out@mark}$. The
+% remaining commands must still wait until the next output page is
+% ready. It works only for output commands in the main text which moved to
 % the next page but not for floating output commands.
 %    \begin{macrocode}
-    \newcommand*\@@@exec@outs{% 
+    \newcommand*\@@@exec@outs{%
       \begingroup
 %    \end{macrocode}
 % Pending io's $=\cmd{\@tempcntb} = \mbox{TOTAL-OUTS}\,-\,\mbox{LAST-EXEC}$
@@ -433,13 +441,13 @@
                        FIRSTMARK:\firstmarks\@@@out@mark\space\space
                        BOTMARK:\botmarks\@@@out@mark}%
 %    \end{macrocode}
-% Last valid pending entry $ = \cmd{\@tempcntb} = 
+% Last valid pending entry $ = \cmd{\@tempcntb} =
 %   \mbox{PENDING-OUTS}\,-\,\mbox{TOTAL-OUTS}\,+\,\mbox{BOTMARK} $
 %   \par\noindent
-% Number of invalid (moved) out's $ = \cmd{\@tempcnta} = 
+% Number of invalid (moved) out's $ = \cmd{\@tempcnta} =
 %   \mbox{TOTAL-OUTS}\,-\,\mbox{BOTMARK} $
 %    \begin{macrocode}
-        \advance\@tempcnta-\c@@@total@outs \advance\@tempcntb\@tempcnta 
+        \advance\@tempcnta-\c@@@total@outs \advance\@tempcntb\@tempcnta
         \@tempcnta-\@tempcnta%
         \ifnum\@tempcnta>\z@
           \LL@debug@info{%
@@ -452,12 +460,12 @@
             \ifnum\@tempcnta<\@tempcntb%
               \reserved@a%  execute output's related to the current page box.
               \global\advance\c@@@last@exec\@ne
-              \LL@debug@info{>>> execute output command number 
+              \LL@debug@info{>>> execute output command number
                        \the\c@@@last@exec\space<<<}%
             \else
-%    \end{macrocode}            
+%    \end{macrocode}
 % Other output's must be resaved and still pending.
-%    \begin{macrocode} 
+%    \begin{macrocode}
               \expandafter\g@addto@macro\expandafter\reserved@b\expandafter{%
                 \reserved@a,}%
             \fi
@@ -492,7 +500,7 @@
 %  \end{macro}
 %  \begin{macro}{\shipout}
 %  We make \LaTeX's \cmd{\shipout} inefficacious (no more shipout at
-%  all). 
+%  all).
 %    \begin{macrocode}
   \def\shipout{\deadcycles\z@\setbox\@tempboxa=}
 %    \end{macrocode}
@@ -507,13 +515,15 @@
 %  \begin{macro}{\LL@toomanypages}
 %  Now elsewhere \dots
 %  \end{macro}
+% \changes{v1.1a}{2015/12/27}{Using \cmd{\dimexpr} instead of
+%   package `calc'.(RN)}
 %    \begin{macrocode}
 \LoadClass{article}
-\RequirePackage{everyshi,calc,graphicx}
+\RequirePackage{everyshi,graphicx}
 %    \end{macrocode}
 %  \begin{macro}{\LL@pagesize@specials}
 % Now the graphics driver is known.
-% We will Check the graphics driver and set special code for page 
+% We will Check the graphics driver and set special code for page
 % dimensions and other.
 % \changes{v1.0e}{2013/11/06}{Patch from Toby Thurston for XeLaTeX. (RN)}
 %    \begin{macrocode}
@@ -557,7 +567,7 @@
 }
 %    \end{macrocode}
 %  \end{macro}
-%  
+%
 %  \begin{macro}{\LL@CmdIgnored}
 %    \begin{macrocode}
 \newcommand*\LL@CmdIgnored[1]{%
@@ -609,7 +619,7 @@
 \renewcommand{\footnotesize}{\old@footnotesize\let\@listi\@listI}
 %    \end{macrocode}
 %  \begin{macro}{\sectfont}
-% User macro for changing the font of the typesetted parameter of 
+% User macro for changing the font of the typesetted parameter of
 % the \cmd{\?section} commands.
 %    \begin{macrocode}
 \newcommand{\sectfont}{\bfseries}
@@ -713,7 +723,7 @@
 % if the user assigns to any of the length registers |\topmargin|,
 % |\evensidemargin|, |\oddsidemargin| using |\setlength|, chaos will
 % happen.
-% 
+%
 %    \begin{macrocode}
 \newcommand*\setmargins[4]{%
 %    \end{macrocode}
@@ -724,20 +734,19 @@
 %    \end{macrocode}
 % temp. bottom!
 %    \begin{macrocode}
-   \setlength\evensidemargin{#2}% 
-   \setlength\textheight{%
-     \paperheight-\topmargin-\evensidemargin%
-     -\headheight-\headsep-\footskip}%
+   \setlength\evensidemargin{#2}%
+   \textheight=\dimexpr\paperheight
+     -\topmargin-\evensidemargin-\headheight-\headsep-\footskip
 %    \end{macrocode}
 % temp. left!
 %    \begin{macrocode}
-   \setlength\oddsidemargin{#3}% 
+   \setlength\oddsidemargin{#3}%
 %    \end{macrocode}
 % temp. right!
 %    \begin{macrocode}
-   \setlength\evensidemargin{#4}% 
-   \setlength\textwidth{%
-     \paperwidth-\oddsidemargin-\evensidemargin-\marginparwidth-\marginparsep}%
+   \setlength\evensidemargin{#4}%
+   \textwidth=\dimexpr\paperwidth
+     -\oddsidemargin-\evensidemargin-\marginparwidth-\marginparsep
 %    \end{macrocode}
 % real top!
 %    \begin{macrocode}
@@ -749,7 +758,7 @@
 %    \end{macrocode}
 %  probably not necessary
 %    \begin{macrocode}
-   \evensidemargin\oddsidemargin%
+   \evensidemargin\oddsidemargin
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -776,8 +785,8 @@
 %  Adds the given parameter~|#2| (some picture commands) to a
 %  macro which will be used inside a zero-dimensional picture environment
 %  located at the lower left corner of a page. Parameter~|#1|
-%  selects the page number. The star version adds the picture commands to the 
-%  background of one of the combined large pages instead of one of the small 
+%  selects the page number. The star version adds the picture commands to the
+%  background of one of the combined large pages instead of one of the small
 %  pages.
 %    \begin{macrocode}
 \newcommand\AddToBackground{%
@@ -793,10 +802,12 @@
 %  \end{macro}
 % \begin{macro}{\LenToUnit}
 % \changes{v1.0a}{2004/08/08}{New macro \cmd{\LenToUnit}. (RN)}
-% \cmd{\LenToUnit}\marg{dimension} can be used in a 
+% \changes{v1.1a}{2015/12/27}{\cmd{\providecommand} instead of
+%   \cmd{\newcommand}. (RN)}
+% \cmd{\LenToUnit}\marg{dimension} can be used in a
 % |picture| environment instead of multiples of \cmd{\unitlength}.
 %    \begin{macrocode}
-\newcommand\LenToUnit[1]{#1\@gobble}
+\providecommand\LenToUnit[1]{#1\@gobble}
 %    \end{macrocode}
 %  \end{macro}
 %  \begin{macro}{\CutLine}
@@ -864,34 +875,65 @@
 % With ``combine'' option the six small pages will be saved in box registers
 % (\cmd{\LL@boxI}\dots \cmd{\LL@boxVI}).
 % The box255 with the page content must be a bit moved to get a
-% ``normal-sized'' box. 
+% ``normal-sized'' box.
+% \changes{v1.1a}{2015/12/27}{Additions for new option `foldcorr'. (RN)}
 %    \begin{macrocode}
 \newcommand*\LL@savePage{%
   \ifnum\c@LL@page<7\relax
-%    \end{macrocode}  
-% Add a background picture to a single small page. 
-%    \begin{macrocode}
-    \setbox\@cclv\vbox{%
-      \vbox{\@tempdima=1in\relax
-        \@tempdimb=\paperheight\advance\@tempdimb-\@tempdima
-        \pictur@(0,0)(\LenToUnit{\@tempdima},\LenToUnit{\@tempdimb})%
-          \begingroup
-          \set@typeset@protect
-          \@nameuse{LL@smallPic\Roman{LL@page}}%
-          %\set@display@protect
-          \endgroup
-        \endpicture}%
-        \nointerlineskip\box\@cclv}%
+    \LL@tempdima=\paperwidth
     \ifLL@combine
+      \iffoldcorr
+        \@tempswafalse
+        \ifnum\c@LL@page=4\relax
+          \@tempswatrue
+        \else
+          \ifnum\c@LL@page=5\relax
+            \@tempswatrue
+          \fi
+        \fi
+        \if@tempswa\LL@tempdima=0.9797979798\paperwidth
+        \else\LL@tempdima=1.0101010101\paperwidth \fi
+      \fi
       \@@@exec@outs
       \expandafter\newsavebox\csname LL@box\Roman{LL@page}\endcsname%
       \setbox\@cclv=\vbox{\vskip1in\unvbox\@cclv}%
       \setbox\@cclv=\vbox{\moveright1in\box\@cclv}%
       \setbox\@cclv=\hb@xt@\paperwidth{\box\@cclv\hss}%
-      \setbox\@cclv=\vb@xt@\paperheight{\box\@cclv\vss}%
-      \global\expandafter\setbox%
-        \csname LL@box\Roman{LL@page}\endcsname=\box\@cclv%
+      \iffoldcorr\setbox\@cclv=\hb@xt@\LL@tempdima{\hss\box\@cclv\hss}\fi
+%    \end{macrocode}
+% Add a background picture to a single small page (`combine').
+%    \begin{macrocode}
+      \setbox\@cclv=\vb@xt@\paperheight{%
+        \vbox{%
+          \pictur@(0,0)(0,\LenToUnit{\paperheight})%
+            \begingroup
+              \set@typeset@protect
+              \paperwidth=\LL@tempdima
+              \@nameuse{LL@smallPic\Roman{LL@page}}%
+            \endgroup
+          \endpicture
+        }%
+        \nointerlineskip\box\@cclv\vss
+      }%
+      \global\expandafter\setbox
+        \csname LL@box\Roman{LL@page}\endcsname=\box\@cclv
       \typeout{\@spaces[\the\c@LL@page] ==> [\Roman{LL@page}]}%
+    \else
+%    \end{macrocode}
+% Add a background picture to a single small page (`nocombine').
+%    \begin{macrocode}
+      \setbox\@cclv\vbox{%
+        \vbox{\@tempdima=1in\relax
+          \@tempdimb=\paperheight\advance\@tempdimb-\@tempdima
+          \pictur@(0,0)(\LenToUnit{\@tempdima},\LenToUnit{\@tempdimb})%
+            \begingroup
+              \set@typeset@protect
+              \@nameuse{LL@smallPic\Roman{LL@page}}%
+            \endgroup
+          \endpicture
+        }%
+        \nointerlineskip\box\@cclv
+      }%
     \fi
   \fi
   \ifnum\c@LL@page=7\relax
@@ -966,7 +1008,7 @@
 %  \begin{macro}{\LL@preparePages}
 %  \begin{macro}{\LL@preparePage}
 % Helper macros for page output: reassemble the small pages.
-% 
+%
 %    \begin{macrocode}
     \newcommand*\LL@shipoutPage[1]{%
 %     \set@display@protect
@@ -978,7 +1020,7 @@
     \newcommand*\LL@preparePages[3]{%
       \typeout{[\@Roman{##1}\space\@Roman{##2}\space\@Roman{##3}] ==>}%
 %    \end{macrocode}
-% Add a background picture to a large page. 
+% Add a background picture to a large page.
 %    \begin{macrocode}
       \pictur@(0,0)\@nameuse{LL@largePic\Roman{page}}\endpicture%
       \LL@preparePage{##1}\LL@preparePage{##2}\LL@preparePage{##3}}%
@@ -988,9 +1030,9 @@
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
-% Combine and output the frontside and the backside. 
+% Combine and output the frontside and the backside.
 % The option two part arranges the pages in a different than the ``natural''
-% order, to allow the typesetting of a 4 page leaflet and a detachable 2 page 
+% order, to allow the typesetting of a 4 page leaflet and a detachable 2 page
 % form, for summaries, fill-in forms, applications, questionnaires, etc.
 %    \begin{macrocode}
       \LL@selectOutput
@@ -1179,7 +1221,7 @@ standard classes.
 
 \item
 You may use list-like environments just as in the standard classes.
-The left margins have been adjusted to work well with the 
+The left margins have been adjusted to work well with the
 \Lopt{a4paper} and \Lopt{letterpaper} class options.
 With other target page sizes, you'll have to adjust them.
 
@@ -1226,7 +1268,7 @@ nor is there any space reserved for these.
 
 However, you can restore them, if you like.
 To do so, use |\pagestyle| as with the standard classes,
-and |\setlength| to adjust the corresponding parameters (like 
+and |\setlength| to adjust the corresponding parameters (like
 |\headheight|).
 At last, you have to call the new macro \par
 |  \setmargins{top}{bottom}{left}{right}|.
@@ -1304,20 +1346,24 @@ Default options are marked with an asterisk:
 \item[\Lopt{foldmark}{\defaultmarker}, \Lopt{nofoldmark}]
   These options specifiy whether or not a fold mark is to be printed.
 \item[\Lopt{combine}{\defaultmarker}, \Lopt{nocombine}]
-  These options specify whether the (small) pages should be output 
-  combined on a (large) target page (\Lopt{combine}) or as individual 
+  These options specify whether the (small) pages should be output
+  combined on a (large) target page (\Lopt{combine}) or as individual
   pages (\Lopt{nocombine}).
 
-  At the same time, the determine behaviour in case the text does not 
+  At the same time, the determine behaviour in case the text does not
   fit on six (small) pages.
   By default (\Lopt{combine}), an error is raised---and the surplus pages
   will be gobbled.
   Otherwise (\Lopt{nocombine}), just a warning will be issued;
   shortening the text appropriately is left to the user.
 \item[\Lopt{twopart}, \Lopt{notwopart}{\defaultmarker}]
-  Allows the typesetting of a four page leaflet (first part) and a two page 
+  Allows the typesetting of a four page leaflet (first part) and a two page
   detachable form (second part), for fill-in forms, questionnaires, applications,
   etc.
+\item[\Lopt{foldcorr}, \Lopt{nofoldcorr}{\defaultmarker}]
+  Decreases the width of pages 4 and 5 by 2\,\% (A4 paper: 2\,mm) and
+  increases the other pages by 1\,\% (A4 paper: 1\,mm) for easier
+  folding in combine mode.
 \end{description}
 
 Other options are passed to the \Lclass{article} class.
