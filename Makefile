@@ -1,4 +1,4 @@
-# Rolf Niepraschk, 2013-11-07, Rolf.Niepraschk@gmx.de
+# Rolf Niepraschk, 2017-03-17, Rolf.Niepraschk@gmx.de
 
 .SUFFIXES : .tex .ltx .dvi .ps .pdf .eps
 
@@ -11,7 +11,7 @@ LATEX = latex
 VERSION = $(shell awk -F"[{}]" '/fileversion/ {print $$2}' leaflet.dtx)
 
 DIST_DIR = leaflet
-DIST_FILES = leaflet.dtx leaflet.ins leaflet.pdf leaflet-manual.pdf README
+DIST_FILES = leaflet.dtx leaflet.ins leaflet.pdf leaflet-manual.pdf README.md
 ARCHNAME = $(CLASS)-$(VERSION).zip
 
 all : leaflet.cls leaflet.pdf leaflet-manual.pdf

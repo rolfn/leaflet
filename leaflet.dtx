@@ -4,7 +4,7 @@
 %  (c) 1998 J\"urgen Schlegelmilch    <schlegel@informatik.uni-rostock.de>
 %  (c) 2000 Walter Schmidt            <w.a.schmidt@gmx.net>
 %  (c) 2002/2004 Rolf Niepraschk      <Rolf.Niepraschk@gmx.de> and
-%                Hubert G\"a\ss{}lein <hubertjg@gmx.de>
+%                Hubert G\"a\ss{}lein
 %  (c) 2012,... Rolf Niepraschk       <Rolf.Niepraschk@gmx.de>
 %
 % This file may be distributed and/or modified under the
@@ -27,8 +27,8 @@
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v1.1a}   % change this when leaflet-manual changed, too.
-\def\filedate{2015/12/27}
+\def\fileversion{v1.1b}   % change this when leaflet-manual changed, too.
+\def\filedate{2017/03/17}
 \def\docdate {2015/12/27} % change this when leaflet-manual changed, too.
 %</driver|manual>
 %<*driver>
@@ -52,7 +52,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1275}
+% \CheckSum{1303}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -221,7 +221,7 @@
 }
 %    \end{macrocode}
 % \changes{v1.0d}{2004/12/22}{Invalid code for option ``nofoldmark''
-% changed. Thanks to Una Smith |<una.smith@att.net>|. (RN)}
+% changed. Thanks to Una Smith. (RN)}
 %    \begin{macrocode}
 \DeclareOption{nofoldmark}{\def\LL@foldmark{}}%
 %    \end{macrocode}
@@ -523,13 +523,14 @@
 %    \end{macrocode}
 %  \begin{macro}{\LL@pagesize@specials}
 % Now the graphics driver is known.
-% We will Check the graphics driver and set special code for page
+% We will check the graphics driver and set special code for page
 % dimensions and other.
 % \changes{v1.0e}{2013/11/06}{Patch from Toby Thurston for XeLaTeX. (RN)}
+% \changes{v1.1b}{2017/03/17}{Adding code for LuaTeX \textgreater 0.85.
+% Thanks to Knut Lickert for his bug report. (RN)}
 %    \begin{macrocode}
 \newcommand*\LL@pagesize@specials[2]{}
-\@ifundefined{Gin@driver}{}%
-{%
+\@ifundefined{Gin@driver}{}{%
   \ifx\Gin@driver\@empty\else%
     \filename@parse{\Gin@driver}\@tempswafalse%
     \def\reserved@a{dvips}%
@@ -548,6 +549,19 @@
       \def\LL@pagesize@specials#1#2{%
         \@tempdima=#1\@tempdimb=#2%
         \pdfpagewidth\@tempdima\pdfpageheight\@tempdimb}%
+    \fi
+    \def\reserved@a{luatex}%
+    \ifx\filename@base\reserved@a
+      \ClassInfo{leaflet}{Generating code for LuaTeX}%
+      \ifx\pdfvariable\@undefined
+        \def\LL@pagesize@specials#1#2{%
+          \@tempdima=#1\@tempdimb=#2%
+          \pdfpagewidth\@tempdima\pdfpageheight\@tempdimb}%     
+      \else
+        \def\LL@pagesize@specials#1#2{%
+          \@tempdima=#1\@tempdimb=#2%
+          \pagewidth\@tempdima\pageheight\@tempdimb}%
+      \fi
     \fi
     \def\reserved@a{xetex}%
     \ifx\filename@base\reserved@a
