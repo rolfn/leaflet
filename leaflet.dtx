@@ -540,14 +540,14 @@
     \if@tempswa
       \ClassInfo{leaflet}{Generating code for dvips}%
       \def\LL@pagesize@specials#1#2{%
-        \@tempdima=#1\@tempdimb=#2%
+        \@tempdima=#1\@tempdimb=#2 %
         \AtBeginDvi{\special{papersize=\the\@tempdima,\the\@tempdimb}}}%
     \fi
     \def\reserved@a{pdftex}%
     \ifx\filename@base\reserved@a
       \ClassInfo{leaflet}{Generating code for pdfTeX}%
       \def\LL@pagesize@specials#1#2{%
-        \@tempdima=#1\@tempdimb=#2%
+        \@tempdima=#1\@tempdimb=#2 %
         \pdfpagewidth\@tempdima\pdfpageheight\@tempdimb}%
     \fi
     \def\reserved@a{luatex}%
@@ -555,11 +555,11 @@
       \ClassInfo{leaflet}{Generating code for LuaTeX}%
       \ifx\pdfpagewidth\@undefined
         \def\LL@pagesize@specials#1#2{%
-          \@tempdima=#1\@tempdimb=#2%
+          \@tempdima=#1\@tempdimb=#2 %
           \pagewidth\@tempdima\pageheight\@tempdimb}%    
       \else
         \def\LL@pagesize@specials#1#2{%
-          \@tempdima=#1\@tempdimb=#2%
+          \@tempdima=#1\@tempdimb=#2 %
           \pdfpagewidth\@tempdima\pdfpageheight\@tempdimb}% 
       \fi
     \fi
