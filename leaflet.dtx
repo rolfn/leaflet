@@ -984,12 +984,6 @@
 %    \begin{macrocode}
     \let\@outputpage\LL@outputpage
 %    \end{macrocode}
-% Suppresses all shipout hook's clients (removing other kinds of
-% background pictures) but our page saving macro is still needed for
-% the next step and must be set again. Question: How do clear all shipout hooks?
-%    \begin{macrocode}
-    \AddToHook{shipout/before}{\LL@savePage}%
-%    \end{macrocode}
 % Create empty pages if necessary.
 %    \begin{macrocode}
     \loop\ifnum\c@LL@page<7\relax
@@ -1000,11 +994,19 @@
 %
 % \subsubsection{Reassembling the small pages}
 %
+% Suppresses all shipout hook's clients (removing other kinds of
+% background pictures). 
+%    \begin{macrocode}
+    \RemoveFromHook{shipout/before}[*]
+    \RemoveFromHook{shipout/foreground}[*]
+    \RemoveFromHook{shipout/background}[*]
+    \RemoveFromHook{shipout/firstpage}[*]
+    \RemoveFromHook{shipout/lastpage}[*]
+%    \end{macrocode}
 % Here begins the real output using \LaTeX's original \cmd{\shipout}.
 % Our code in the shipout hook isn't active any more.
 % The begin dvi hook is reactivated.
 %    \begin{macrocode}
-    \let\LL@savePage=\relax
     \paperwidth=3\paperwidth
     \iflandscape
       \LL@pagesize@specials{\paperwidth}{\paperheight}%
