@@ -16,7 +16,7 @@ ARCHNAME = $(CLASS)-$(VERSION).zip
 
 all : leaflet.cls leaflet.pdf leaflet-manual.pdf
 
-leaflet.cls : leaflet.dtx
+leaflet.cls leaflet-manual.tex: leaflet.dtx
 	$(TEX) $(basename $<).ins
 
 leaflet-manual.pdf : leaflet-manual.tex leaflet.cls
