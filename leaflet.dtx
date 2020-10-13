@@ -20,16 +20,16 @@
 % \fi
 %
 % \iffalse
-%<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<class>\NeedsTeXFormat{LaTeX2e}[2020-10-01]
 %<class>\ProvidesClass{leaflet}
-%<class>  [2015/12/27 v1.1a LaTeX document class (JS,WaS,RN,HjG)]
+%<class>  [2020/10/13 v2.0a LaTeX document class (JS,WaS,RN,HjG)]
 %
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v1.1b}   % change this when leaflet-manual changed, too.
-\def\filedate{2017/03/17}
-\def\docdate {2015/12/27} % change this when leaflet-manual changed, too.
+\def\fileversion{v2.0a}   % change this when leaflet-manual changed, too.
+\def\filedate{2020/10/13}
+\def\docdate {2020/10/12}    % change this when leaflet-manual changed, too.
 %</driver|manual>
 %<*driver>
 \listfiles
@@ -52,7 +52,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1303}
+% \CheckSum{1280}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -144,16 +144,30 @@
 %<*class>
 %    \end{macrocode}
 %
+% \subsection{Test whether the LaTeX format is new enough}
+% We use the 'shipout/before' hook.
+%    \begin{macrocode}
+\@ifundefined{DiscardShipoutBox}{%
+  \ClassError{leaflet}{%
+    LaTeX version equal to or newer \MessageBreak
+    than '2020-10-01' is required%
+  }{%
+    Renew your TeX installation.%
+  }%  
+}{}
+%    \end{macrocode}
 % \subsection{Saving some internal macros\dots}
 %
 %    \begin{macrocode}
-\let\LL@shipout\shipout \let\LL@outputpage\@outputpage
+\let\LL@outputpage\@outputpage
 \let\LL@begindvi\@begindvi \let\LL@@end\@@end
 %    \end{macrocode}
 % \subsection{Option processing}
 %
 % \changes{v1.0b}{2004/08/12}{New option
-%    \texttt{nospecialtricks} for testing purposes. (RN)}
+%    \texttt{nospecialtricks} for testing purposes. (RN)} 
+% \changes{v2.0a}{2020/10/13}{The macro \cmd{\LenToUnit} is no longer 
+%    required. (RN)}
 %    \begin{macrocode}
 \@ifundefined{iflandscape}{\newif\iflandscape}{}%
 \@ifundefined{iftumble}{\newif\iftumble}{}%
@@ -213,10 +227,10 @@
 \DeclareOption{foldmark}{%
   \def\LL@foldmark{%
     \begingroup
-      \linethickness{\LenToUnit{\foldmarkrule}}%
+      \linethickness{\foldmarkrule}%
       \@tempdima=\dimexpr\paperheight-\LL@tmargin
-      \put(0,\LenToUnit{\@tempdima}){%
-        \line(0,-1){\LenToUnit{\foldmarklength}}}%
+      \put(0,\@tempdima){%
+        \line(0,-1){\foldmarklength}}%
     \endgroup}%
 }
 %    \end{macrocode}
@@ -284,13 +298,12 @@
 %  \begin{macro}{\write}
 %  \begin{macro}{\openout}
 %  \begin{macro}{\closeout}
-% Im Folgenden definieren wir die \TeX{} primitives \cmd{\immediate},
-% \cmd{\write}, \cmd{\openout} und \cmd{\closeout} um. Alle nicht
-% ``immediate'' ausgef\"uhrten Anweisungen werden dem Makro
-% \cmd{\@@@pending@outs} (Kommaliste) hinzugef\"ugt. So k\"onnen speziell die
-% \cmd{\write}-Anweisungen unabh\"angig von \TeX's \cmd{\shipout}
-% zu einem g\"unstigen Zeitpunkt ausgef\"uhrt werden. For V\TeX\ we
-% must keep in mind that \cmd{\immediate}\cmd{\special} exist.
+% In the following we redefine the \TeX{} primitives \cmd{\immediate}, 
+% \cmd{\write}, \cmd{\openout}, and \cmd{\closeout}. All of them not 
+% ``immediate'' executed statements are added to the macro 
+% \cmd{\@@@pending@outs} (comma list). So especially the \cmd{\write} 
+% statements independent of \TeX's \cmd{\shipout} run at a convenient time. For 
+% V\TeX\ we must keep in mind that \cmd{\immediate}\cmd{\special} exist.
 % \changes{v1.0b}{2004/08/12}{\cmd{\special} must be processed similar
 % to e.\,g. \cmd{\write} (V\TeX). (RN)}
 %    \begin{macrocode}
@@ -426,20 +439,20 @@
 % ready. It works only for output commands in the main text which moved to
 % the next page but not for floating output commands.
 %    \begin{macrocode}
-    \newcommand*\@@@exec@outs{%
-      \begingroup
+\newcommand*\@@@exec@outs{%
+  \begingroup
 %    \end{macrocode}
 % Pending io's $=\cmd{\@tempcntb} = \mbox{TOTAL-OUTS}\,-\,\mbox{LAST-EXEC}$
 %    \begin{macrocode}
-        \@tempcntb\c@@@total@outs\advance\@tempcntb-\c@@@last@exec%
-        \edef\reserved@a{\botmarks\@@@out@mark}%
-        \ifx\reserved@a\@empty\@tempcnta\z@\else\@tempcnta\reserved@a\fi%
-        \LL@debug@info{PENDING-OUTS:\the\@tempcntb\space\space
-                       TOTAL-OUTS:\the\c@@@total@outs\space\space
-                       LAST-EXEC:\the\c@@@last@exec\space\space
-                       TOPMARK:\topmarks\@@@out@mark\space\space
-                       FIRSTMARK:\firstmarks\@@@out@mark\space\space
-                       BOTMARK:\botmarks\@@@out@mark}%
+    \@tempcntb\c@@@total@outs\advance\@tempcntb-\c@@@last@exec%
+    \edef\reserved@a{\botmarks\@@@out@mark}%
+    \ifx\reserved@a\@empty\@tempcnta\z@\else\@tempcnta\reserved@a\fi%
+    \LL@debug@info{PENDING-OUTS:\the\@tempcntb\space\space
+                   TOTAL-OUTS:\the\c@@@total@outs\space\space
+                   LAST-EXEC:\the\c@@@last@exec\space\space
+                   TOPMARK:\topmarks\@@@out@mark\space\space
+                   FIRSTMARK:\firstmarks\@@@out@mark\space\space
+                   BOTMARK:\botmarks\@@@out@mark}%
 %    \end{macrocode}
 % Last valid pending entry $ = \cmd{\@tempcntb} =
 %   \mbox{PENDING-OUTS}\,-\,\mbox{TOTAL-OUTS}\,+\,\mbox{BOTMARK} $
@@ -447,33 +460,33 @@
 % Number of invalid (moved) out's $ = \cmd{\@tempcnta} =
 %   \mbox{TOTAL-OUTS}\,-\,\mbox{BOTMARK} $
 %    \begin{macrocode}
-        \advance\@tempcnta-\c@@@total@outs \advance\@tempcntb\@tempcnta
-        \@tempcnta-\@tempcnta%
-        \ifnum\@tempcnta>\z@
-          \LL@debug@info{%
-            >>> resave \the\@tempcnta\space output command(s).
-                Too early to execute! <<<}%
-        \fi
-        \@tempcnta\z@ \def\reserved@b{}%
-        \@for\reserved@a :=\@@@pending@outs\do{%
-          \ifx\reserved@a\@empty\else
-            \ifnum\@tempcnta<\@tempcntb%
-              \reserved@a%  execute output's related to the current page box.
-              \global\advance\c@@@last@exec\@ne
-              \LL@debug@info{>>> execute output command number
-                       \the\c@@@last@exec\space<<<}%
-            \else
+    \advance\@tempcnta-\c@@@total@outs \advance\@tempcntb\@tempcnta
+    \@tempcnta-\@tempcnta%
+    \ifnum\@tempcnta>\z@
+      \LL@debug@info{%
+        >>> resave \the\@tempcnta\space output command(s).
+            Too early to execute! <<<}%
+    \fi
+    \@tempcnta\z@ \def\reserved@b{}%
+    \@for\reserved@a :=\@@@pending@outs\do{%
+      \ifx\reserved@a\@empty\else
+        \ifnum\@tempcnta<\@tempcntb%
+          \reserved@a%  execute output's related to the current page box.
+          \global\advance\c@@@last@exec\@ne
+          \LL@debug@info{>>> execute output command number
+                   \the\c@@@last@exec\space<<<}%
+        \else
 %    \end{macrocode}
 % Other output's must be resaved and still pending.
 %    \begin{macrocode}
-              \expandafter\g@addto@macro\expandafter\reserved@b\expandafter{%
-                \reserved@a,}%
-            \fi
-            \advance\@tempcnta\@ne%
-          \fi}%
-        \expandafter\@temptokena\expandafter{\reserved@b}%
-        \xdef\@@@pending@outs{\the\@temptokena}%
-      \endgroup}%
+          \expandafter\g@addto@macro\expandafter\reserved@b\expandafter{%
+            \reserved@a,}%
+        \fi
+        \advance\@tempcnta\@ne%
+      \fi}%
+    \expandafter\@temptokena\expandafter{\reserved@b}%
+    \xdef\@@@pending@outs{\the\@temptokena}%
+  \endgroup}%
 %    \end{macrocode}
 %  \end{macro}
 %    \begin{macrocode}
@@ -498,13 +511,6 @@
     \if@nobreak\ifvmode\nobreak\fi\fi}%
 %    \end{macrocode}
 %  \end{macro}
-%  \begin{macro}{\shipout}
-%  We make \LaTeX's \cmd{\shipout} inefficacious (no more shipout at
-%  all).
-%    \begin{macrocode}
-  \def\shipout{\deadcycles\z@\setbox\@tempboxa=}
-%    \end{macrocode}
-%  \end{macro}
 %  \begin{macro}{\@begindvi}
 %  Delay \cmd{\@begindvi} to be executed until the real page output.
 %    \begin{macrocode}
@@ -519,7 +525,7 @@
 %   package `calc'.(RN)}
 %    \begin{macrocode}
 \LoadClass{article}
-\RequirePackage{everyshi,graphicx}
+\RequirePackage{graphicx}
 %    \end{macrocode}
 %  \begin{macro}{\LL@pagesize@specials}
 % Now the graphics driver is known.
@@ -814,16 +820,6 @@
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
-% \begin{macro}{\LenToUnit}
-% \changes{v1.0a}{2004/08/08}{New macro \cmd{\LenToUnit}. (RN)}
-% \changes{v1.1a}{2015/12/27}{\cmd{\providecommand} instead of
-%   \cmd{\newcommand}. (RN)}
-% \cmd{\LenToUnit}\marg{dimension} can be used in a
-% |picture| environment instead of multiples of \cmd{\unitlength}.
-%    \begin{macrocode}
-\providecommand\LenToUnit[1]{#1\@gobble}
-%    \end{macrocode}
-%  \end{macro}
 %  \begin{macro}{\CutLine}
 %  \begin{macro}{\CutLine*}
 %  \begin{macro}{\Scissors}
@@ -840,13 +836,13 @@
     \if@tempswa
       \AddToBackground{#1}{%
         \put(0,0){%
-          \rotatebox{90}{\makebox(\LenToUnit{\paperheight},0){%
+          \rotatebox{90}{\makebox(\paperheight,0){%
             \normalsize
             \dotfill}}}}%
     \else
       \AddToBackground{#1}{%
         \put(0,0){%
-          \rotatebox{90}{\makebox(\LenToUnit{\paperheight},0){%
+          \rotatebox{90}{\makebox(\paperheight,0){%
             \normalsize
             \dotfill\Scissors\dotfill\dotfill\Scissors\dotfill}}}}%
     \fi
@@ -876,7 +872,7 @@
 %  \end{macro}
 %  We use our own page saving macro instead of real \LaTeX\ output.
 %    \begin{macrocode}
-\AtBeginDocument{\EveryShipout{\LL@savePage}}
+\AtBeginDocument{\AddToHook{shipout/before}{\LL@savePage}}
 %    \end{macrocode}
 %  \begin{macro}{LL@page}
 % A counter for the small pages (absolute counting).
@@ -891,8 +887,11 @@
 % The box255 with the page content must be a bit moved to get a
 % ``normal-sized'' box.
 % \changes{v1.1a}{2015/12/27}{Additions for new option `foldcorr'. (RN)}
+% \changes{v2.0a}{2020/10/13}{Temporary don't call \cmd{\@@@exec@outs}. (RN)}
+% \changes{v2.0a}{2020/10/13}{Using \LaTeX's new 'shipout/before' hook. (RN)}
 %    \begin{macrocode}
 \newcommand*\LL@savePage{%
+  \DiscardShipoutBox
   \ifnum\c@LL@page<7\relax
     \LL@tempdima=\paperwidth
     \ifLL@combine
@@ -908,18 +907,18 @@
         \if@tempswa\LL@tempdima=0.9797979798\paperwidth
         \else\LL@tempdima=1.0101010101\paperwidth \fi
       \fi
-      \@@@exec@outs
+      %%%\@@@exec@outs
       \expandafter\newsavebox\csname LL@box\Roman{LL@page}\endcsname%
-      \setbox\@cclv=\vbox{\vskip1in\unvbox\@cclv}%
-      \setbox\@cclv=\vbox{\moveright1in\box\@cclv}%
-      \setbox\@cclv=\hb@xt@\paperwidth{\box\@cclv\hss}%
-      \iffoldcorr\setbox\@cclv=\hb@xt@\LL@tempdima{\hss\box\@cclv\hss}\fi
+      \setbox\ShipoutBox=\vbox{\vskip1in\unvbox\ShipoutBox}%
+      \setbox\ShipoutBox=\vbox{\moveright1in\box\ShipoutBox}%
+      \setbox\ShipoutBox=\hb@xt@\paperwidth{\box\ShipoutBox\hss}%
+      \iffoldcorr\setbox\ShipoutBox=\hb@xt@\LL@tempdima{\hss\box\ShipoutBox\hss}\fi
 %    \end{macrocode}
 % Add a background picture to a single small page (`combine').
 %    \begin{macrocode}
-      \setbox\@cclv=\vb@xt@\paperheight{%
+      \setbox\ShipoutBox=\vb@xt@\paperheight{%
         \vbox{%
-          \pictur@(0,0)(0,\LenToUnit{\paperheight})%
+          \pictur@(0,0)(0,\paperheight)%
             \begingroup
               \set@typeset@protect
               \paperwidth=\LL@tempdima
@@ -927,26 +926,26 @@
             \endgroup
           \endpicture
         }%
-        \nointerlineskip\box\@cclv\vss
+        \nointerlineskip\box\ShipoutBox\vss
       }%
       \global\expandafter\setbox
-        \csname LL@box\Roman{LL@page}\endcsname=\box\@cclv
+        \csname LL@box\Roman{LL@page}\endcsname=\box\ShipoutBox
       \typeout{\@spaces[\the\c@LL@page] ==> [\Roman{LL@page}]}%
     \else
 %    \end{macrocode}
 % Add a background picture to a single small page (`nocombine').
 %    \begin{macrocode}
-      \setbox\@cclv\vbox{%
+      \setbox\ShipoutBox\vbox{%
         \vbox{\@tempdima=1in\relax
           \@tempdimb=\paperheight\advance\@tempdimb-\@tempdima
-          \pictur@(0,0)(\LenToUnit{\@tempdima},\LenToUnit{\@tempdimb})%
+          \pictur@(0,0)(\@tempdima,\@tempdimb)%
             \begingroup
               \set@typeset@protect
               \@nameuse{LL@smallPic\Roman{LL@page}}%
             \endgroup
           \endpicture
         }%
-        \nointerlineskip\box\@cclv
+        \nointerlineskip\box\ShipoutBox
       }%
     \fi
   \fi
@@ -985,13 +984,11 @@
 %    \begin{macrocode}
     \let\@outputpage\LL@outputpage
 %    \end{macrocode}
-% Suppresses all everyshi's clients (removing other kinds of
+% Suppresses all shipout hook's clients (removing other kinds of
 % background pictures) but our page saving macro is still needed for
-% the next step and must be set again.
+% the next step and must be set again. Question: How do clear all shipout hooks?
 %    \begin{macrocode}
-    \def\@EveryShipout@Hook{}%
-    \def\@EveryShipout@AtNextHook{}%
-    \EveryShipout{\LL@savePage}%
+    \AddToHook{shipout/before}{\LL@savePage}%
 %    \end{macrocode}
 % Create empty pages if necessary.
 %    \begin{macrocode}
@@ -1004,10 +1001,10 @@
 % \subsubsection{Reassembling the small pages}
 %
 % Here begins the real output using \LaTeX's original \cmd{\shipout}.
-% The \textsf{everyshi} package isn't active any more.
+% Our code in the shipout hook isn't active any more.
 % The begin dvi hook is reactivated.
 %    \begin{macrocode}
-    \let\shipout\LL@shipout \let\@begindvi\LL@begindvi
+    \let\LL@savePage=\relax
     \paperwidth=3\paperwidth
     \iflandscape
       \LL@pagesize@specials{\paperwidth}{\paperheight}%
@@ -1049,19 +1046,19 @@
 % order, to allow the typesetting of a 4 page leaflet and a detachable 2 page
 % form, for summaries, fill-in forms, applications, questionnaires, etc.
 %    \begin{macrocode}
-      \LL@selectOutput
+    \LL@selectOutput
     \iftwopart
-        {\setcounter{page}{1}%
-         \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{6}{4}{1}}}}%
-        {\setcounter{page}{2}%
-         \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{5}}}}%
+      {\setcounter{page}{1}%
+       \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{6}{4}{1}}}}%
+      {\setcounter{page}{2}%
+       \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{5}}}}%
     \else
-        {\setcounter{page}{1}%
-         \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{5}{6}{1}}}}%
-        {\setcounter{page}{2}%
-         \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{4}}}}%
+      {\setcounter{page}{1}%
+       \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{5}{6}{1}}}}%
+      {\setcounter{page}{2}%
+       \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{4}}}}%
     \fi
-      \LL@@end
+    \LL@@end
   }%
 %    \end{macrocode}
 % End of the redefinition of \cmd{\@@end}.
@@ -1138,8 +1135,7 @@
 \MakeShortVerb{\|}
 \usepackage{url}
 \usepackage{graphicx}
-\usepackage[dvipsnames,usenames]{color}
-\definecolor{LIGHTGRAY}{gray}{.9}
+\usepackage[svgnames]{xcolor}
 
 %%%%\renewcommand{\descfont}{\normalfont}
 \newcommand\Lpack[1]{\textsf{#1}}
@@ -1160,13 +1156,13 @@
 \CutLine{6}%  Dotted line with scissors
 
 \AddToBackground{5}{%  Background of a small page
-  \put(0,0){\textcolor{Cerulean}{\rule{\paperwidth}{\paperheight}}}}
+  \put(0,0){\textcolor{LightSkyBlue}{\rule{\paperwidth}{\paperheight}}}}
 
 \AddToBackground*{2}{% Background of a large page
-  \put(\LenToUnit{.5\paperwidth},\LenToUnit{.5\paperheight}){%
+  \put(.5\paperwidth,.5\paperheight){%
     \makebox(0,0)[c]{%
       \resizebox{.9\paperwidth}{!}{\rotatebox{35.26}{%
-        \textsf{\textbf{\textcolor{LIGHTGRAY}{BACKGROUND}}}}}}}}
+        \textsf{\textbf{\textcolor{LightGray}{BACKGROUND}}}}}}}}
 
 \begin{document}
 
@@ -1207,10 +1203,6 @@ document is created in PostScript or PDF format, using
   \item V\TeX{} in PS or PDF mode.
 \end{itemize}
 (Some other drivers supported by standard \LaTeX{} work as well.)
-
-The non-standard macro package \Lpack{everyshi} \cite{cit:everyshi} is
-used by the \Lclass{leaflet} class.
-
 
 \section{Features}
 
@@ -1401,9 +1393,6 @@ this document class.
 \bibitem{cit:latex-man}
   \textsc{L.\,Lamport}: \LaTeX. A Document Preparation System.
   \textit{User's Guide And Reference Manual.} Second Edition. 1994.
-\bibitem{cit:everyshi}
-  \textsc{M.\,Schr\"oder}: The \Lpack{everyshi} package. 2001.
-  CTAN: \url{macros/latex/contrib/ms/everyshi.dtx}
 \end{thebibliography}
 
 \loggingall
