@@ -11,13 +11,8 @@ Recommended TDS locations:
    leaflet.cls:                     tex/latex/leaflet
    leaflet.pdf,leaflet-manual.pdf:  doc/latex/leaflet
 ```
-For general installation advice, see
-http://www.tex.ac.uk/cgi-bin/texfaq2html?label=instpackages
 
 For bug reports use [this address](https://github.com/rolfn/leaflet/issues).
 
 The leaflet document class is also on CTAN:[macros/latex/contrib/leaflet](http://mirrors.ctan.org/macros/latex/contrib/leaflet)
-
-
-
 
