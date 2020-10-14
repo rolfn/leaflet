@@ -22,14 +22,14 @@
 % \iffalse
 %<class>\NeedsTeXFormat{LaTeX2e}[2020-10-01]
 %<class>\ProvidesClass{leaflet}
-%<class>  [2020/10/13 v2.0a LaTeX document class (JS,WaS,RN,HjG)]
+%<class>  [2020/10/14 v2.0b LaTeX document class (JS,WaS,RN,HjG)]
 %
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v2.0a}   % change this when leaflet-manual changed, too.
-\def\filedate{2020/10/13}
-\def\docdate {2020/10/12}    % change this when leaflet-manual changed, too.
+\def\fileversion{v2.0b}   % change this when leaflet-manual changed, too.
+\def\filedate{2020/10/14}
+\def\docdate {2020/10/14} % change this when leaflet-manual changed, too.
 %</driver|manual>
 %<*driver>
 \listfiles
@@ -52,7 +52,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1280}
+% \CheckSum{1270}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -159,8 +159,7 @@
 % \subsection{Saving some internal macros\dots}
 %
 %    \begin{macrocode}
-\let\LL@outputpage\@outputpage
-\let\LL@begindvi\@begindvi \let\LL@@end\@@end
+\let\LL@begindvi\@begindvi 
 %    \end{macrocode}
 % \subsection{Option processing}
 %
@@ -884,14 +883,14 @@
 %  \begin{macro}{\LL@savePage}
 % With ``combine'' option the six small pages will be saved in box registers
 % (\cmd{\LL@boxI}\dots \cmd{\LL@boxVI}).
-% The box255 with the page content must be a bit moved to get a
+% The \cmd{\ShipoutBox} with the page content must be a bit moved to get a
 % ``normal-sized'' box.
 % \changes{v1.1a}{2015/12/27}{Additions for new option `foldcorr'. (RN)}
 % \changes{v2.0a}{2020/10/13}{Temporary don't call \cmd{\@@@exec@outs}. (RN)}
 % \changes{v2.0a}{2020/10/13}{Using \LaTeX's new 'shipout/before' hook. (RN)}
 %    \begin{macrocode}
 \newcommand*\LL@savePage{%
-  \DiscardShipoutBox
+  \ifLL@combine\DiscardShipoutBox\fi
   \ifnum\c@LL@page<7\relax
     \LL@tempdima=\paperwidth
     \ifLL@combine
@@ -966,53 +965,57 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-% \subsubsection{Generating missing small pages}
-%
-% NOTE TO OURSELVES:
+% \noindent NOTE TO OURSELVES:
 %  All the following must be done if the document code is already
-%  processed.
+%  processed. 
+%
+% \changes{v2.0b}{2020/10/14}{Using hooks instead of redefinition of \cmd{\@@end}. (RN)}
+%  \begin{macro}{\LL@add@empty@pages}
+% Generating missing small pages
 %    \begin{macrocode}
-\ifLL@combine
+\newcommand*\LL@add@empty@pages{%
+   \clearpage\pagestyle{empty}%
+   \loop\ifnum\c@LL@page<7\relax
+     \ClassInfo{leaflet}{Generating empty page \the\c@page}%
+     \null\newpage
+   \repeat
+}
 %    \end{macrocode}
-%  \begin{macro}{\@@end}
+%  \end{macro}
+%  \begin{macro}{\LL@shipout@combined@pages}
 %    \begin{macrocode}
-  \def\@@end{%
-    \clearpage\pagestyle{empty}%
-%    \end{macrocode}
-% Restore the original \cmd{\@outputpage} command (removing any related
-% background pictures).
-%    \begin{macrocode}
-    \let\@outputpage\LL@outputpage
-%    \end{macrocode}
-% Create empty pages if necessary.
-%    \begin{macrocode}
-    \loop\ifnum\c@LL@page<7\relax
-      \ClassInfo{leaflet}{Generating empty page \the\c@page}%
-      \null\newpage
-    \repeat
+\newcommand*\LL@shipout@combined@pages{%
 %    \end{macrocode}
 %
 % \subsubsection{Reassembling the small pages}
 %
 % Suppresses all shipout hook's clients (removing other kinds of
-% background pictures). 
+% background pictures). Our page saving macro is still needed for
+% the next step and must be set again.
+% \changes{v2.0b}{2020/10/14}{Suppress other background images. (RN)}
 %    \begin{macrocode}
-    \RemoveFromHook{shipout/before}[*]
-    \RemoveFromHook{shipout/foreground}[*]
-    \RemoveFromHook{shipout/background}[*]
-    \RemoveFromHook{shipout/firstpage}[*]
-    \RemoveFromHook{shipout/lastpage}[*]
+  \RemoveFromHook{shipout/foreground}[*]
+  \RemoveFromHook{shipout/background}[*]
+  \RemoveFromHook{shipout/firstpage}[*]
+  \RemoveFromHook{shipout/lastpage}[*]
+  \RemoveFromHook{shipout/before}[*]
+  \AddToHook{shipout/before}{\LL@savePage}    
 %    \end{macrocode}
-% Here begins the real output using \LaTeX's original \cmd{\shipout}.
-% Our code in the shipout hook isn't active any more.
+% Create empty pages if necessary.
+%    \begin{macrocode}
+  \LL@add@empty@pages
+%    \end{macrocode}
+% Here begins the real output. LaTeX's \cmd{\shipout} will no more suppressed. 
 % The begin dvi hook is reactivated.
 %    \begin{macrocode}
-    \paperwidth=3\paperwidth
-    \iflandscape
-      \LL@pagesize@specials{\paperwidth}{\paperheight}%
-    \else
-      \LL@pagesize@specials{\paperheight}{\paperwidth}%
-    \fi
+  \RemoveFromHook{shipout/before}[*]
+  \let\@begindvi\LL@begindvi
+  \paperwidth=3\paperwidth
+  \iflandscape
+    \LL@pagesize@specials{\paperwidth}{\paperheight}%
+  \else
+    \LL@pagesize@specials{\paperheight}{\paperwidth}%
+  \fi
 %    \end{macrocode}
 %  \begin{macro}{\LL@shipoutPage}
 % \changes{v1.0c}{2004/08/13}{Fix \cmd{\protect}-ion problems. (RN/HjG)}
@@ -1023,22 +1026,22 @@
 % Helper macros for page output: reassemble the small pages.
 %
 %    \begin{macrocode}
-    \newcommand*\LL@shipoutPage[1]{%
+  \newcommand*\LL@shipoutPage[1]{%
 %     \set@display@protect
-      \let \protect \noexpand
-      \shipout\vb@xt@\paperheight{%
-        \set@typeset@protect
-        \vskip-1in%
-        \@begindvi\hb@xt@\paperwidth{\hskip-1in##1\hss}\vss}}%
-    \newcommand*\LL@preparePages[3]{%
-      \typeout{[\@Roman{##1}\space\@Roman{##2}\space\@Roman{##3}] ==>}%
+    \let \protect \noexpand
+    \shipout\vb@xt@\paperheight{%
+      \set@typeset@protect
+      \vskip-1in%
+      \@begindvi\hb@xt@\paperwidth{\hskip-1in##1\hss}\vss}}%
+  \newcommand*\LL@preparePages[3]{%
+    \typeout{[\@Roman{##1}\space\@Roman{##2}\space\@Roman{##3}] ==>}%
 %    \end{macrocode}
 % Add a background picture to a large page.
 %    \begin{macrocode}
-      \pictur@(0,0)\@nameuse{LL@largePic\Roman{page}}\endpicture%
-      \LL@preparePage{##1}\LL@preparePage{##2}\LL@preparePage{##3}}%
-    \newcommand*\LL@preparePage[1]{%
-      \expandafter\box\csname LL@box\@Roman{##1}\endcsname}%
+    \pictur@(0,0)\@nameuse{LL@largePic\Roman{page}}\endpicture%
+    \LL@preparePage{##1}\LL@preparePage{##2}\LL@preparePage{##3}}%
+  \newcommand*\LL@preparePage[1]{%
+    \expandafter\box\csname LL@box\@Roman{##1}\endcsname}%
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -1048,35 +1051,31 @@
 % order, to allow the typesetting of a 4 page leaflet and a detachable 2 page
 % form, for summaries, fill-in forms, applications, questionnaires, etc.
 %    \begin{macrocode}
-    \LL@selectOutput
-    \iftwopart
-      {\setcounter{page}{1}%
-       \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{6}{4}{1}}}}%
-      {\setcounter{page}{2}%
-       \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{5}}}}%
-    \else
-      {\setcounter{page}{1}%
-       \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{5}{6}{1}}}}%
-      {\setcounter{page}{2}%
-       \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{4}}}}%
-    \fi
-    \LL@@end
-  }%
+  \LL@selectOutput
+  \iftwopart
+    {\setcounter{page}{1}%
+     \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{6}{4}{1}}}}%
+    {\setcounter{page}{2}%
+     \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{5}}}}%
+  \else
+    {\setcounter{page}{1}%
+     \LL@shipoutPage{\LL@rotate@I{\LL@preparePages{5}{6}{1}}}}%
+    {\setcounter{page}{2}%
+     \LL@shipoutPage{\LL@rotate@II{\LL@preparePages{2}{3}{4}}}}%
+  \fi
+}%
 %    \end{macrocode}
-% End of the redefinition of \cmd{\@@end}.
 %  \end{macro}
-%    \begin{macrocode}
+%    \begin{macrocode}    
+\ifLL@combine
+  \AddToHook{enddocument/end}{\LL@shipout@combined@pages}
 \else
 %    \end{macrocode}
 % Create empty pages if necessary and then call the normal \LaTeX\ end.
 %    \begin{macrocode}
   \LL@pagesize@specials{\paperwidth}{\paperheight}%
   \AtEndDocument{%
-    \clearpage\pagestyle{empty}%
-    \loop\ifnum\c@LL@page<7\relax
-      \ClassInfo{leaflet}{Generating empty page \the\c@page}%
-      \null\newpage
-    \repeat
+    \LL@add@empty@pages
   }
 \fi
 %</class>
