@@ -22,12 +22,12 @@
 % \iffalse
 %<class>\NeedsTeXFormat{LaTeX2e}[2020-10-01]
 %<class>\ProvidesClass{leaflet}
-%<class>  [2020/10/14 v2.0b LaTeX document class (JS,WaS,RN,HjG)]
+%<class>  [2020/10/14 v2.0c LaTeX document class (JS,WaS,RN,HjG)]
 %
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v2.0b}   % change this when leaflet-manual changed, too.
+\def\fileversion{v2.0c}   % change this when leaflet-manual changed, too.
 \def\filedate{2020/10/14}
 \def\docdate {2020/10/14} % change this when leaflet-manual changed, too.
 %</driver|manual>
@@ -52,7 +52,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1272}
+% \CheckSum{1273}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -437,6 +437,7 @@
 % remaining commands must still wait until the next output page is
 % ready. It works only for output commands in the main text which moved to
 % the next page but not for floating output commands.
+% \changes{v2.0c}{2020/10/14}{Missing \cmd{\set@display@protect} (RN)}
 %    \begin{macrocode}
 \newcommand*\@@@exec@outs{%
   \begingroup
@@ -467,6 +468,7 @@
             Too early to execute! <<<}%
     \fi
     \@tempcnta\z@ \def\reserved@b{}%
+    \set@display@protect
     \@for\reserved@a :=\@@@pending@outs\do{%
       \ifx\reserved@a\@empty\else
         \ifnum\@tempcnta<\@tempcntb%
@@ -890,6 +892,7 @@
 % \changes{v2.0a}{2020/10/13}{Using \LaTeX's new 'shipout/before' hook. (RN)}
 % \changes{v2.0b}{2020/10/14}{Renamed \cmd{\LL@savePage} to 
 %   \cmd{\LL@processPage}. (RN)}
+% \changes{v2.0c}{2020/10/14}{Activated \cmd{\@@@exec@outs} again. (RN)}
 %    \begin{macrocode}
 \newcommand*\LL@processPage{%
   \ifLL@combine\DiscardShipoutBox\fi
@@ -908,7 +911,7 @@
         \if@tempswa\LL@tempdima=0.9797979798\paperwidth
         \else\LL@tempdima=1.0101010101\paperwidth \fi
       \fi
-      %%%\@@@exec@outs
+      \@@@exec@outs
       \expandafter\newsavebox\csname LL@box\Roman{LL@page}\endcsname%
       \setbox\ShipoutBox=\vbox{\vskip1in\unvbox\ShipoutBox}%
       \setbox\ShipoutBox=\vbox{\moveright1in\box\ShipoutBox}%
