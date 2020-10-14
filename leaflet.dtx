@@ -52,7 +52,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1270}
+% \CheckSum{1272}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -871,7 +871,7 @@
 %  \end{macro}
 %  We use our own page saving macro instead of real \LaTeX\ output.
 %    \begin{macrocode}
-\AtBeginDocument{\AddToHook{shipout/before}{\LL@savePage}}
+\AtBeginDocument{\AddToHook{shipout/before}{\LL@processPage}}
 %    \end{macrocode}
 %  \begin{macro}{LL@page}
 % A counter for the small pages (absolute counting).
@@ -880,16 +880,18 @@
 \newcommand\LL@tempa{}
 %    \end{macrocode}
 %  \end{macro}
-%  \begin{macro}{\LL@savePage}
+%  \begin{macro}{\LL@processPage}
 % With ``combine'' option the six small pages will be saved in box registers
 % (\cmd{\LL@boxI}\dots \cmd{\LL@boxVI}).
 % The \cmd{\ShipoutBox} with the page content must be a bit moved to get a
-% ``normal-sized'' box.
+% ``normal-sized'' box. In ``nocombine'' mode only put the background picture.
 % \changes{v1.1a}{2015/12/27}{Additions for new option `foldcorr'. (RN)}
-% \changes{v2.0a}{2020/10/13}{Temporary don't call \cmd{\@@@exec@outs}. (RN)}
+% \changes{v2.0a}{2020/10/13}{Do not call \cmd{\@@@exec@outs} temporarily. (RN)}
 % \changes{v2.0a}{2020/10/13}{Using \LaTeX's new 'shipout/before' hook. (RN)}
+% \changes{v2.0b}{2020/10/14}{Renamed \cmd{\LL@savePage} to 
+%   \cmd{\LL@processPage}. (RN)}
 %    \begin{macrocode}
-\newcommand*\LL@savePage{%
+\newcommand*\LL@processPage{%
   \ifLL@combine\DiscardShipoutBox\fi
   \ifnum\c@LL@page<7\relax
     \LL@tempdima=\paperwidth
@@ -911,7 +913,8 @@
       \setbox\ShipoutBox=\vbox{\vskip1in\unvbox\ShipoutBox}%
       \setbox\ShipoutBox=\vbox{\moveright1in\box\ShipoutBox}%
       \setbox\ShipoutBox=\hb@xt@\paperwidth{\box\ShipoutBox\hss}%
-      \iffoldcorr\setbox\ShipoutBox=\hb@xt@\LL@tempdima{\hss\box\ShipoutBox\hss}\fi
+      \iffoldcorr
+        \setbox\ShipoutBox=\hb@xt@\LL@tempdima{\hss\box\ShipoutBox\hss}\fi
 %    \end{macrocode}
 % Add a background picture to a single small page (`combine').
 %    \begin{macrocode}
@@ -969,7 +972,8 @@
 %  All the following must be done if the document code is already
 %  processed. 
 %
-% \changes{v2.0b}{2020/10/14}{Using hooks instead of redefinition of \cmd{\@@end}. (RN)}
+% \changes{v2.0b}{2020/10/14}{Using hooks instead of redefinition 
+%   of \cmd{\@@end}. (RN)}
 %  \begin{macro}{\LL@add@empty@pages}
 % Generating missing small pages
 %    \begin{macrocode}
@@ -999,14 +1003,14 @@
   \RemoveFromHook{shipout/firstpage}[*]
   \RemoveFromHook{shipout/lastpage}[*]
   \RemoveFromHook{shipout/before}[*]
-  \AddToHook{shipout/before}{\LL@savePage}    
+  \AddToHook{shipout/before}{\LL@processPage}    
 %    \end{macrocode}
 % Create empty pages if necessary.
 %    \begin{macrocode}
   \LL@add@empty@pages
 %    \end{macrocode}
 % Here begins the real output. LaTeX's \cmd{\shipout} will no more suppressed. 
-% The begin dvi hook is reactivated.
+% The begin dvi hook is reactivated. Final removing content from the hook.
 %    \begin{macrocode}
   \RemoveFromHook{shipout/before}[*]
   \let\@begindvi\LL@begindvi
