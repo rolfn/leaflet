@@ -20,7 +20,6 @@
 % \fi
 %
 % \iffalse
-%<class>\NeedsTeXFormat{LaTeX2e}[2020-10-01]
 %<class>\ProvidesClass{leaflet}
 %<class>  [2020/10/14 v2.0c LaTeX document class (JS,WaS,RN,HjG)]
 %
@@ -147,14 +146,15 @@
 % \subsection{Test whether the LaTeX format is new enough}
 % We use the 'shipout/before' hook.
 %    \begin{macrocode}
-\@ifundefined{DiscardShipoutBox}{%
+\providecommand\IfFormatAtLeastTF{\@ifl@t@r\fmtversion} 
+\IfFormatAtLeastTF{2020/10/01}{}{%
   \ClassError{leaflet}{%
     LaTeX version equal to or newer \MessageBreak
-    than '2020-10-01' is required%
+    than '2020/10/01' is required%
   }{%
     Renew your TeX installation.%
-  }%  
-}{}
+  }%
+}
 %    \end{macrocode}
 % \subsection{Saving some internal macros\dots}
 %
