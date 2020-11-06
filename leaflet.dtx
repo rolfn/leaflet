@@ -21,14 +21,14 @@
 %
 % \iffalse
 %<class>\ProvidesClass{leaflet}
-%<class>  [2020/10/25 v2.0d LaTeX document class (JS,WaS,RN,HjG)]
+%<class>  [2020/11/06 v2.1a LaTeX document class (JS,WaS,RN,HjG)]
 %
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v2.0d}   % change this when leaflet-manual changed, too.
-\def\filedate{2020/10/25}
-\def\docdate {2020/10/14} % change this when leaflet-manual changed, too.
+\def\fileversion{v2.1a}   % change this when leaflet-manual changed, too.
+\def\filedate{2020/11/06}
+\def\docdate {2020/11/06} % change this when leaflet-manual changed, too.
 %</driver|manual>
 %<*driver>
 \listfiles
@@ -51,7 +51,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1276}
+% \CheckSum{1290}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -824,31 +824,31 @@
 %  \end{macro}
 %  \end{macro}
 %  \begin{macro}{\CutLine}
+% \changes{v2.1a}{2020/11/06}{Optional parameter for line type}
 %  \begin{macro}{\CutLine*}
 %  \begin{macro}{\Scissors}
-% Adds a dotted line with two scissors on the left side of the page given as
-% parameter |#1|.
-% The starred version draws only the dotted line.
+% Adds a line with two scissors on the left side of the page given as
+% parameter |#1|. The starred version draws only the line.
 %    \begin{macrocode}
 \newcommand*\CutLine{%
   \@ifstar{\@tempswatrue\LL@CutLine}{\@tempswafalse\LL@CutLine}}
 \@onlypreamble\CutLine
-\newcommand*\LL@CutLine[1]{%
+\newcommand*\LL@CutLine[2][.]{%
   \ifLL@combine
     \ifx\Scissors\@empty\@tempswatrue\fi
-    \if@tempswa
-      \AddToBackground{#1}{%
-        \put(0,0){%
-          \rotatebox{90}{\makebox(\paperheight,0){%
-            \normalsize
-            \dotfill}}}}%
-    \else
-      \AddToBackground{#1}{%
-        \put(0,0){%
-          \rotatebox{90}{\makebox(\paperheight,0){%
-            \normalsize
-            \dotfill\Scissors\dotfill\dotfill\Scissors\dotfill}}}}%
-    \fi
+    \if .#1%
+      \def\@tempa{\dotfill}%
+    \else\if -#1%
+      \def\@tempa{\hrulefill}%
+    \fi\fi
+    \edef\@tempb{%
+      \noexpand\AddToBackground{#2}{%
+        \noexpand\put(0,0){%
+          \noexpand\rotatebox{90}{\noexpand\makebox(\paperheight,0){%
+            \noexpand\normalsize\@tempa\if@tempswa\else\noexpand\Scissors%
+              \@tempa\@tempa\noexpand\Scissors\@tempa\fi}}}}%
+    }%
+    \@tempb
   \fi}
 \IfFileExists{pifont.sty}
   {\RequirePackage{pifont}%
@@ -1161,8 +1161,8 @@
   Hubert G\"a\ss lein}
 \date{Last updated~\docdate\\printed \today}
 
-\CutLine*{1}% Dotted line without scissors
-\CutLine{6}%  Dotted line with scissors
+\CutLine*{1}%   Dotted line without scissors (same as \CutLine*[.]{1})
+\CutLine[-]{6}% Solid line with scissors
 
 \AddToBackground{5}{%  Background of a small page
   \put(0,0){\textcolor{LightSkyBlue}{\rule{\paperwidth}{\paperheight}}}}
