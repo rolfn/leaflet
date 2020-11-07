@@ -1303,8 +1303,8 @@ third page.
 \item
 The macro |\CutLine| draws a vertical dotted line with
 scissor symbols between the page indicated by its argument and the
-preceding one.
-The starred version omits the scissors symbols.
+preceding one. The optional parameter |[-]| changes the dotted line to a
+solid one. The starred version omits the scissors symbols.
 
 \item
 In case the text does not fit on six pages, a warning (or error,
@@ -1327,8 +1327,8 @@ The typeface to be used for the section headings is given by the macro
 Both macros default to |\bfseries| and can be changed using
 |\renewcommand*|.
 
-The horizontal and vertical and margins of the (small) pages
-default to 8\,mm and 11\,mm, respectively, and can be changed
+The horizontal and vertical margins of the (small) pages
+have the standard sizes 8 mm and 11 mm, respectively, and can be changed
 using |\setmargins|, as explained above.
 This may be useful, if the printing engine exhibits larger unprintable
 margins.
