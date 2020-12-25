@@ -26,9 +26,9 @@
 %<*driver|manual>
 %<driver>\def\filename{leaflet.dtx}
 %<manual>\def\filename{leaflet-manual.tex}
-\def\fileversion{v2.1a}   % change this when leaflet-manual changed, too.
-\def\filedate{2020/11/06}
-\def\docdate {2020/11/06} % change this when leaflet-manual changed, too.
+\def\fileversion{v2.1b}   % change this when leaflet-manual changed, too.
+\def\filedate{2020/11/07}
+\def\docdate {2020/11/07} % change this when leaflet-manual changed, too.
 %</driver|manual>
 %<*driver>
 \listfiles
@@ -51,7 +51,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1290}
+% \CheckSum{1289}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -831,11 +831,11 @@
 % parameter |#1|. The starred version draws only the line.
 %    \begin{macrocode}
 \newcommand*\CutLine{%
-  \@ifstar{\@tempswatrue\LL@CutLine}{\@tempswafalse\LL@CutLine}}
+  \@ifstar{\@tempswafalse\LL@CutLine}{\@tempswatrue\LL@CutLine}}
 \@onlypreamble\CutLine
 \newcommand*\LL@CutLine[2][.]{%
   \ifLL@combine
-    \ifx\Scissors\@empty\@tempswatrue\fi
+    \ifx\Scissors\@empty\@tempswafalse\fi
     \if .#1%
       \def\@tempa{\dotfill}%
     \else\if -#1%
@@ -845,7 +845,7 @@
       \noexpand\AddToBackground{#2}{%
         \noexpand\put(0,0){%
           \noexpand\rotatebox{90}{\noexpand\makebox(\paperheight,0){%
-            \noexpand\normalsize\@tempa\if@tempswa\else\noexpand\Scissors%
+            \noexpand\normalsize\@tempa\if@tempswa\noexpand\Scissors%
               \@tempa\@tempa\noexpand\Scissors\@tempa\fi}}}}%
     }%
     \@tempb
